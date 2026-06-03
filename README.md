@@ -9,17 +9,17 @@
 在项目根目录下执行以下命令：
 
 ```bash
-SKILL_BASE_URL=https://github.com/timqin-m/howtone-xhs-skill/tree/main npx skill skills/xhs-catch
+SKILL_BASE_URL=https://github.com/timqin-m/howtone-xhs-skill/tree/main npx skill skills/howtone-xhs-skill
 ```
 
-安装完成后，技能文件将被放置在项目的 `.codebuddy/skills/xhs-catch` 或 `.claude/skills/xhs-catch` 目录中。
+安装完成后，技能文件将被放置在项目的 `.codebuddy/skills/howtone-xhs-skill` 或 `.claude/skills/howtone-xhs-skill` 目录中。
 
 ## 🚀 快速开始
 
 进入安装后的技能脚本目录安装依赖：
 
 ```bash
-cd .codebuddy/skills/xhs-catch/scripts
+cd .codebuddy/skills/howtone-xhs-skill/scripts
 npm install
 ```
 
@@ -52,14 +52,14 @@ npx ts-node generate-report.ts
 
 ## 🛠️ 仓库目录结构
 
-本仓库严格遵循 `npx skill` 规范，所有资源均存放在 `skills/xhs-catch/` 目录下：
+本仓库严格遵循 `npx skill` 规范，所有资源均存放在 `skills/howtone-xhs-skill/` 目录下：
 
 ```text
 .
 ├── README.md               # 仓库全局说明
 ├── .gitignore              # Git 忽略配置
 └── skills/
-    └── xhs-catch/          # 技能主目录
+    └── howtone-xhs-skill/  # 技能主目录
         ├── SKILL.md        # 技能系统提示词 (Prompt Instructions)
         └── scripts/        # 自动化脚本及依赖
             ├── login.ts

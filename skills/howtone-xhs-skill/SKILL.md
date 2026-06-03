@@ -1,5 +1,5 @@
 ---
-name: xhs-catch
+name: howtone-xhs-skill
 description: |
   小红书笔记采集工具。当用户需要从小红书按关键词搜索并批量采集笔记数据时，使用此 skill。
 
