@@ -2,17 +2,17 @@
 
 小红书笔记采集与痛点分析工具。基于 Kimi WebBridge 模拟真人浏览器操作，批量抓取指定关键词下的笔记数据（标题、正文、作者、图片、点赞/收藏及高赞评论等），并能一键同步数据到「好痛 Howtone」平台，进行 AI 自动分析、商机提炼与文案生成。
 
-## 📦 安装方法 (通过 `npx skill`)
+## 📦 安装方法 (通过 `npx skills`)
 
-你可以通过 `npx skill` 将本技能直接安装到你的 CodeBuddy / Claude AI 助手项目中。
+你可以通过 Vercel 官方的 `skills` CLI 将本技能直接安装到你的 AI 助手项目（支持 Claude Code, Cursor, Cline, GitHu Copilot 等 18+ 种 AI Agent 客户端）中。
 
 在项目根目录下执行以下命令：
 
 ```bash
-SKILL_BASE_URL=https://github.com/timqin-m/howtone-xhs-skill/tree/main npx skill skills/howtone-xhs-skill
+npx skills add timqin-m/howtone-xhs-skill
 ```
 
-安装完成后，技能文件将被放置在项目的 `.codebuddy/skills/howtone-xhs-skill` 或 `.claude/skills/howtone-xhs-skill` 目录中。
+安装完成后，技能文件将被放置在项目的 `.codebuddy/skills/howtone-xhs-skill`、`.claude/skills/howtone-xhs-skill` 或相应的 Agent 技能目录中。
 
 ## 🚀 快速开始
 
@@ -52,7 +52,7 @@ npx ts-node generate-report.ts
 
 ## 🛠️ 仓库目录结构
 
-本仓库严格遵循 `npx skill` 规范，所有资源均存放在 `skills/howtone-xhs-skill/` 目录下：
+本仓库严格遵循 `Agent Skills` 规范，所有资源均存放在 `skills/howtone-xhs-skill/` 目录下：
 
 ```text
 .
