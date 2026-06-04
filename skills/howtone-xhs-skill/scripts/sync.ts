@@ -161,6 +161,16 @@ function loadConfig(): ZionConfig {
   throw new Error('未找到有效 Zion 配置，请检查 .zion/credentials.yaml');
 }
 
+function extractUserIdFromToken(token: string): string | undefined {
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    // ZERO_USER_ID 是 Zion 用户ID
+    return payload.ZERO_USER_ID || payload.sub;
+  } catch {
+    return undefined;
+  }
+}
+
 function buildInsertMutation(tableName: string, note: XHSNote, imageIds: string[], userId?: string): { query: string; variables: Record<string, any> } {
   const objects: any = {
     xhs_note_id: note.xhs_note_id,
@@ -177,8 +187,9 @@ function buildInsertMutation(tableName: string, note: XHSNote, imageIds: string[
     crawl_time: note.crawl_time,
   };
 
+  // 关联当前登录用户（所属账户）
   if (userId) {
-    objects.user_id = userId;
+    objects.ud_suoshuzhanghu_id_514a15 = userId;
   }
 
   // 处理图片列表关系 (Array Relationship)
@@ -195,7 +206,7 @@ function buildInsertMutation(tableName: string, note: XHSNote, imageIds: string[
           objects: $objects
           on_conflict: {
             constraint: ${tableName}_xhs_note_id_key,
-            update_columns: [title, content, author_name, author_id, likes, collects, comments_count, comments, keyword, note_url, crawl_time${userId ? ', user_id' : ''}]
+            update_columns: [title, content, author_name, author_id, likes, collects, comments_count, comments, keyword, note_url, crawl_time]
           }
         ) {
           returning {
@@ -211,8 +222,12 @@ function buildInsertMutation(tableName: string, note: XHSNote, imageIds: string[
 export async function syncToZion(notes: XHSNote[], config?: ZionConfig) {
   const cfg = config || loadConfig();
   const results = { success: 0, failed: 0, errors: [] as string[] };
+  const userId = cfg.userId || extractUserIdFromToken(cfg.token);
 
-  console.log(`📡 正在上报情报至 弦外 Overtone 中心...`);
+  console.log(`📡 正在上报情报至 好痛 HOWTONE 中心...`);
+  if (userId) {
+    console.log(`  👤 关联账户: ${userId}`);
+  }
 
   for (const note of notes) {
     const imageIds: string[] = [];
@@ -224,7 +239,7 @@ export async function syncToZion(notes: XHSNote[], config?: ZionConfig) {
       }
     }
 
-    const mutation = buildInsertMutation(cfg.tableName, note, imageIds, cfg.userId);
+    const mutation = buildInsertMutation(cfg.tableName, note, imageIds, userId);
 
     try {
       const res = await fetch(cfg.endpoint, {
