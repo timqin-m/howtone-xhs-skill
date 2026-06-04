@@ -139,7 +139,7 @@ function parseYaml(text: string): any {
 
 function loadConfig(): ZionConfig {
   const zionCredPath = path.resolve(process.cwd(), '.zion', 'credentials.yaml');
-  const siblingZionCredPath = path.resolve(process.cwd(), '..', 'pain-catcher', '.zion', 'credentials.yaml');
+  const siblingZionCredPath = path.resolve(process.cwd(), '..', 'howtone', '.zion', 'credentials.yaml');
   
   let credPath = fs.existsSync(zionCredPath) ? zionCredPath : (fs.existsSync(siblingZionCredPath) ? siblingZionCredPath : null);
 
