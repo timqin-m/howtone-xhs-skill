@@ -402,7 +402,10 @@ export async function main() {
   try {
     console.log('📊 正在为您自动生成本地可视化报告...');
     generateReport();
-    console.log(`✨ 本地可视化报告生成成功！直接双击打开查看：output/index.html`);
+    const reportPath = path.join(OUTPUT_DIR, 'index.html');
+    const reportUrl = `file://${reportPath}`;
+    console.log(`✨ 本地可视化报告生成成功！正在通过 WebBridge 在您的浏览器中直接打开...`);
+    send('navigate', { url: reportUrl, newTab: true, group_title: '采集报告' });
   } catch (err) {
     console.error('⚠ 生成本地可视化报告失败:', (err as Error).message);
   }
