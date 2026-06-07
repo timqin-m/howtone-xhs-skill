@@ -51,13 +51,13 @@ function randomSleep(min: number, max: number) {
 function parseArgs() {
   const args = process.argv.slice(2);
   const keyword = args.find((a) => a.startsWith('--keyword='))?.split('=')[1];
-  const limit = parseInt(args.find((a) => a.startsWith('--limit='))?.split('=')[1] || '20', 10);
+  const limit = parseInt(args.find((a) => a.startsWith('--limit='))?.split('=')[1] || '5', 10);
   const comments = !args.includes('--no-comments');
   const maxComments = parseInt(args.find((a) => a.startsWith('--max-comments='))?.split('=')[1] || '20', 10);
   if (!keyword) {
-    console.error('Usage: npx ts-node webbridge-crawl.ts --keyword="关键词" --limit=20');
+    console.error('Usage: npx ts-node webbridge-crawl.ts --keyword="关键词" --limit=5');
     console.error('  --keyword: 搜索关键词（必填）');
-    console.error('  --limit: 采集数量，默认20');
+    console.error('  --limit: 采集数量，默认5');
     console.error('  --no-comments: 不采集评论');
     console.error('  --max-comments: 最多采集评论数，默认20');
     process.exit(1);

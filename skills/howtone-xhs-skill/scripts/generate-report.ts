@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const OUTPUT_DIR = path.resolve(process.cwd(), 'output');
+const PROJECT_EX_ID = 'rmLyJ0ZJXK8';
 
 interface XHSNote {
   title: string;
@@ -52,12 +53,6 @@ function generateHTML(data: XHSNote[]): string {
   const avgLikes = total > 0 ? Math.round(totalLikes / total) : 0;
   const keywords = [...new Set(data.map((d) => d.keyword).filter(Boolean))];
 
-  // 关键词提取：找高频痛点词
-  const painWords = ['坑', '痛点', '缺点', '后悔', '避雷', '吐槽', '难用', '局限', '失败', '困难', '问题', '挑战'];
-  const painItems = data.filter((item) =>
-    painWords.some((w) => (item.title + item.content).includes(w))
-  );
-
   const jsonData = JSON.stringify(data, null, 2);
 
   return `<!DOCTYPE html>
@@ -65,162 +60,422 @@ function generateHTML(data: XHSNote[]): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>小红书采集报告</title>
+  <title>小红书数据摘要报告 - 好痛 Howtone</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --primary: #ff2442;
-      --bg: #f5f5f5;
-      --card-bg: #fff;
-      --text: #333;
-      --text-light: #666;
-      --tag-bg: #fff0f0;
-      --comment-bg: #fafafa;
-      --border: #eee;
+      --primary: #f43f5e;       /* Rose-500: 优雅的高级玫红 */
+      --primary-hover: #e11d48; /* Rose-600 */
+      --bg: #fafafa;            /* 极简淡灰背景 */
+      --card-bg: #ffffff;
+      --text: #09090b;          /* Zinc-950: 高级深墨 */
+      --text-muted: #52525b;    /* Zinc-600: 辅助字色 */
+      --text-light: #a1a1aa;    /* Zinc-400 */
+      --border: #f4f4f5;        /* Zinc-100 */
+      --border-dark: #e4e4e7;   /* Zinc-200 */
+      --tag-bg: #fff1f2;        /* Rose-50 */
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      padding-bottom: 5rem;
     }
     header {
-      background: linear-gradient(135deg, #ff2442 0%, #ff6b81 100%);
-      color: white;
-      padding: 2rem;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 2rem;
       text-align: center;
     }
-    header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-    header p { opacity: 0.9; font-size: 0.95rem; }
-    .stats {
-      display: flex; justify-content: center; gap: 2rem;
-      padding: 1.5rem; background: white;
-      border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
     }
-    .stat-item { text-align: center; }
-    .stat-value { font-size: 2rem; font-weight: bold; color: var(--primary); }
-    .stat-label { color: var(--text-light); font-size: 0.9rem; }
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    
+    /* 核心提示：好痛云端推广 Banner */
+    .howtone-banner {
+      background: #09090b;
+      color: #ffffff;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      margin: 2rem auto;
+      max-width: 1200px;
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .howtone-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(244,63,94,0.18) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+    }
+    .howtone-banner-content {
+      max-width: 850px;
+      position: relative;
+      z-index: 2;
+    }
+    .howtone-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.75rem;
+      background: rgba(244, 63, 94, 0.18);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .howtone-banner h2 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    .howtone-banner p {
+      color: #d4d4d8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+    .howtone-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(244, 63, 94, 0.3);
+    }
+    .howtone-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.4);
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .stats {
+      display: flex;
+      justify-content: flex-start;
+      gap: 3.5rem;
+      padding: 1.5rem 0;
+      background: none;
+      border-bottom: 1px solid var(--border-dark);
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .stat-item {
+      text-align: left;
+    }
+    .stat-value {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+
+    .filters-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
     .filters {
-      padding: 1rem 2rem; background: white;
-      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
-      position: sticky; top: 0; z-index: 10;
+      padding: 1rem 0;
+      background: transparent;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
     }
     .filter-btn {
-      padding: 0.5rem 1rem; border: 1px solid #ddd; background: white;
-      border-radius: 20px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem;
+      padding: 0.35rem 1rem;
+      border: 1px solid var(--border-dark);
+      background: white;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
     }
     .filter-btn:hover, .filter-btn.active {
-      border-color: var(--primary); background: var(--tag-bg); color: var(--primary);
+      border-color: var(--primary);
+      background: var(--tag-bg);
+      color: var(--primary);
     }
     .search-box {
-      flex: 1; min-width: 200px; padding: 0.5rem 1rem;
-      border: 1px solid #ddd; border-radius: 20px; font-size: 0.95rem;
+      flex: 1;
+      min-width: 200px;
+      padding: 0.35rem 1.2rem;
+      border: 1px solid var(--border-dark);
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.12);
     }
     .export-btn {
-      padding: 0.5rem 1rem; border: none; border-radius: 20px;
-      cursor: pointer; font-size: 0.85rem; color: white;
+      padding: 0.35rem 1rem;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: white;
+      transition: all 0.2s;
     }
-    .export-btn.csv { background: #ff2442; }
-    .export-btn.md { background: #333; }
+    .export-btn.csv { background: var(--text); }
+    .export-btn.csv:hover { background: #27272a; }
+    .export-btn.md { background: var(--text-muted); }
+    .export-btn.md:hover { background: #52525b; }
+
     .container {
-      max-width: 1200px; margin: 0 auto; padding: 2rem;
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
     }
     .card {
-      background: var(--card-bg); border-radius: 12px;
-      overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: transform 0.2s, box-shadow 0.2s;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-dark);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
     }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -5px rgba(0,0,0,0.04);
+      border-color: #d4d4d8;
+    }
     .card-images {
-      display: flex; gap: 4px; padding: 4px; background: #fafafa;
+      display: flex;
+      gap: 2px;
+      padding: 6px;
+      background: #fafafa;
+      border-bottom: 1px solid var(--border);
     }
     .card-images img {
-      flex: 1; height: 120px; object-fit: cover; border-radius: 8px;
+      flex: 1;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 6px;
     }
-    .card-content { padding: 1rem; }
+    .card-content {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
     .card-keyword {
-      display: inline-block; padding: 0.25rem 0.75rem;
-      background: var(--tag-bg); color: var(--primary);
-      border-radius: 12px; font-size: 0.75rem; margin-bottom: 0.5rem;
+      display: inline-flex;
+      padding: 0.15rem 0.5rem;
+      background: var(--tag-bg);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      align-self: flex-start;
     }
-    .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+    }
     .card-text {
-      font-size: 0.9rem; color: var(--text-light);
-      display: -webkit-box; -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical; overflow: hidden;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
       margin-bottom: 1rem;
+      flex: 1;
     }
     .card-meta {
-      display: flex; justify-content: space-between; align-items: center;
-      padding-top: 0.75rem; border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
     }
-    .card-author { font-size: 0.85rem; color: var(--text-light); }
-    .card-stats { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-light); }
+    .card-author {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .card-stats {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
     .comments-section {
-      margin-top: 0.75rem; padding-top: 0.75rem;
-      border-top: 1px dashed #eee;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--border-dark);
     }
     .comments-toggle {
-      font-size: 0.85rem; color: var(--primary); cursor: pointer;
-      background: none; border: none; padding: 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
     }
     .comments-list {
-      margin-top: 0.5rem; display: none;
+      margin-top: 0.5rem;
+      display: none;
     }
-    .comments-list.show { display: block; }
+    .comments-list.show {
+      display: block;
+    }
     .comment-item {
-      padding: 0.5rem; background: var(--comment-bg);
-      border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.85rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border-radius: 6px;
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
     }
-    .comment-author { color: var(--text-light); font-size: 0.8rem; }
-    .comment-content { color: var(--text); margin-top: 0.25rem; }
+    .comment-author {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+    .comment-content {
+      color: var(--text);
+      margin-top: 0.15rem;
+    }
+
     .pain-points-section {
-      background: white; margin: 2rem auto; max-width: 1200px;
-      padding: 2rem; border-radius: 12px;
+      background: white;
+      margin: 3rem auto;
+      max-width: 1200px;
+      padding: 2.5rem;
+      border-radius: 16px;
+      border: 1px solid var(--border-dark);
     }
-    .pain-points-section h2 { margin-bottom: 1rem; color: var(--primary); }
+    .pain-points-section h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
     .pain-point-item {
-      padding: 1rem; background: var(--bg); border-radius: 8px;
-      margin-bottom: 0.75rem; border-left: 4px solid var(--primary);
+      padding: 1.25rem;
+      background: var(--bg);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid var(--primary);
+    }
+    .pain-point-item h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+    .pain-point-item p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
     .empty-state { grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-light); }
-    footer { text-align: center; padding: 2rem; color: var(--text-light); font-size: 0.85rem; }
+    footer { text-align: center; padding: 3rem 0; color: var(--text-light); font-size: 0.8rem; }
   </style>
 </head>
 <body>
   <header>
-    <h1>📕 小红书采集报告</h1>
-    <p>${keywords.join(' · ')} · 共 ${total} 条笔记</p>
+    <h1>📕 小红书数据摘要报告</h1>
+    <p>${keywords.join(' · ')} · 共 ${total} 条笔记摘要</p>
   </header>
 
-  <div class="stats">
-    <div class="stat-item"><div class="stat-value">${total}</div><div class="stat-label">笔记数</div></div>
-    <div class="stat-item"><div class="stat-value">${totalLikes}</div><div class="stat-label">总点赞</div></div>
-    <div class="stat-item"><div class="stat-value">${totalCollects}</div><div class="stat-label">总收藏</div></div>
-    <div class="stat-item"><div class="stat-value">${totalComments}</div><div class="stat-label">总评论</div></div>
-    <div class="stat-item"><div class="stat-value">${avgLikes}</div><div class="stat-label">平均点赞</div></div>
+  <!-- Howtone SaaS 导流与定位 Banner -->
+  <div class="howtone-banner">
+    <div class="howtone-banner-content">
+      <div class="howtone-tag">🎯 好痛 Howtone AI 赋能</div>
+      <h2>💡 本地数据初步摘要报告</h2>
+      <p>
+        注意：当前报告仅为根据您的本地过滤条件生成的<strong>初步原始数据摘要</strong>。<br>
+        本地客户端计算与归因能力有限，不具备深度商业分析价值。
+        如需体验更专业的<strong>多维痛点语义归因、核心商机自动发现、客户声音智能存档、以及爆款小红书推广文案一键生成</strong>，请将数据同步并访问我们的「好痛 Howtone」云端分析平台。
+      </p>
+      <a href="https://zion-app.functorz.com/zero/${PROJECT_EX_ID}/" target="_blank" class="howtone-btn">
+        ✨ 一键同步并访问「好痛 Howtone」
+      </a>
+    </div>
   </div>
 
-  <div class="filters">
-    <button class="filter-btn active" data-filter="all">全部</button>
-    ${keywords.map(k => `<button class="filter-btn" data-filter="${k}">${k}</button>`).join('')}
-    <input type="text" class="search-box" placeholder="搜索标题、正文、评论..." id="search">
-    <button class="export-btn csv" onclick="exportCSV()">📥 导出CSV</button>
-    <button class="export-btn md" onclick="exportMarkdown()">📝 导出MD</button>
+  <div class="stats-container">
+    <div class="stats">
+      <div class="stat-item"><div class="stat-value">${total}</div><div class="stat-label">采集笔记数</div></div>
+      <div class="stat-item"><div class="stat-value">${totalLikes}</div><div class="stat-label">总点赞量</div></div>
+      <div class="stat-item"><div class="stat-value">${totalCollects}</div><div class="stat-label">总收藏量</div></div>
+      <div class="stat-item"><div class="stat-value">${totalComments}</div><div class="stat-label">总评论量</div></div>
+      <div class="stat-item"><div class="stat-value">${avgLikes}</div><div class="stat-label">平均获赞数</div></div>
+    </div>
+  </div>
+
+  <div class="filters-wrapper">
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">全部关键词</button>
+      ${keywords.map(k => `<button class="filter-btn" data-filter="${k}">${k}</button>`).join('')}
+      <input type="text" class="search-box" placeholder="搜索标题、正文、评论..." id="search">
+      <button class="export-btn csv" onclick="exportCSV()">📥 导出 CSV 数据</button>
+      <button class="export-btn md" onclick="exportMarkdown()">📝 导出 Markdown</button>
+    </div>
   </div>
 
   <div class="container" id="cards"></div>
 
   <div class="pain-points-section">
-    <h2>📌 核心痛点总结</h2>
+    <h2>📌 核心痛点初步过滤 (根据本地关键词匹配)</h2>
     <div id="pain-points"></div>
   </div>
 
   <footer>
-    <p>生成时间: ${new Date().toLocaleString('zh-CN')}</p>
+    <p>生成时间: ${new Date().toLocaleString('zh-CN')} · 弦外 Overtone 采集工具提供支持</p>
   </footer>
 
   <script>
