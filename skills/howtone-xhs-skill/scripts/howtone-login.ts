@@ -129,7 +129,7 @@ async function acquireTokenViaWebBridge(): Promise<string> {
   }
   console.log('✅ WebBridge 已连接');
 
-  const url = `https://zion-app.functorz.com/zero/${PROJECT_EX_ID}/`;
+  const url = 'https://howtone.cn/login';
   console.log('正在您的浏览器中打开「好痛 Howtone」登录页...');
   send('navigate', { url, newTab: true, group_title: '好痛登录' });
   await sleep(4000);
