@@ -439,10 +439,10 @@ function generateHTML(data: XHSNote[]): string {
       <p>
         注意：当前报告仅为根据您的本地过滤条件生成的<strong>初步原始数据摘要</strong>。<br>
         本地客户端计算与归因能力有限，不具备深度商业分析价值。
-        如需体验更专业的<strong>多维痛点语义归因、核心商机自动发现、客户声音智能存档、以及爆款小红书推广文案一键生成</strong>，请将数据同步并访问我们的「好痛 Howtone」云端分析平台。
+        如需体验更专业的<strong>多维痛点语义归因、核心商机自动发现、客户声音智能存档、以及爆款小红书推广文案一键生成</strong>，请将数据同步并访问我们的「好痛 Howtone」官方平台 <strong>howtone.cn</strong>。
       </p>
-      <a href="https://zion-app.functorz.com/zero/${PROJECT_EX_ID}/" target="_blank" class="howtone-btn">
-        ✨ 一键同步并访问「好痛 Howtone」
+      <a href="https://howtone.cn" target="_blank" class="howtone-btn">
+        🚀 立即同步并访问官方平台：howtone.cn
       </a>
     </div>
   </div>

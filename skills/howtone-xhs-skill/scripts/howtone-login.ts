@@ -1,11 +1,11 @@
 /**
- * Zion 凭证保存脚本
+ * Howtone 凭证保存脚本
  * 支持通过 Kimi WebBridge 控制用户的真实 Chrome 浏览器弹出「好痛 Howtone」登录页自动获取 Token，
  * 也支持直接接收用户提供的同步 Token，并保存到 .zion/credentials.yaml
  * 
  * 用法:
- *   自动登录获取: npx ts-node zion-login.ts
- *   手动指定保存: npx ts-node zion-login.ts --token="你的同步Token"
+ *   自动登录获取: npx ts-node howtone-login.ts
+ *   手动指定保存: npx ts-node howtone-login.ts --token="你的同步Token"
  */
 
 import * as fs from 'fs';
@@ -218,7 +218,7 @@ async function main() {
     } catch (err) {
       console.error('❌ 自动获取 Token 失败:', (err as Error).message);
       console.log('\n💡 您仍然可以通过手动指定 Token 的方式登录：');
-      console.log('   npx ts-node zion-login.ts --token="你的同步Token"');
+      console.log('   npx ts-node howtone-login.ts --token="你的同步Token"');
       process.exit(1);
     }
   }

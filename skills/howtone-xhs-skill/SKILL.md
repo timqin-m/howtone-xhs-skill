@@ -79,7 +79,7 @@ cd scripts && npm install
 |------|------|
 | `webbridge-crawl.ts` | 通过 WebBridge 控制用户真实浏览器采集 |
 | `login.ts` | 小红书扫码登录，保存 cookies.json |
-| `zion-login.ts` | 保存「好痛 Howtone」项目同步 Token |
+| `howtone-login.ts` | 弹出登录页或自动获取「好痛 Howtone」同步 Token |
 | `sync.ts` | 将采集数据同步到「好痛 Howtone」项目（含图片上传） |
 | `generate-report.ts` | 读取 output/*.json 生成静态 HTML 报告 |
 
@@ -179,8 +179,8 @@ npx ts-node login.ts
 **前提**：先在「好痛 Howtone」用户中心获取同步 Token
 
 ```bash
-# 保存同步 Token
-npx ts-node zion-login.ts --token="你的同步Token"
+# 保存同步 Token (支持自动开启浏览器登录/获取)
+npx ts-node howtone-login.ts
 
 # 同步数据
 npx ts-node sync.ts --file=output/关键词_YYYYMMDD.json

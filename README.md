@@ -49,7 +49,7 @@ npx ts-node generate-report.ts
 ### 4. 同步至「好痛 Howtone」分析平台
 - 首先保存好痛 Token 凭证：
   ```bash
-  npx ts-node zion-login.ts --token="你的同步Token"
+  npx ts-node howtone-login.ts
   ```
 - 上传并同步采集结果：
   ```bash
@@ -73,7 +73,7 @@ npx ts-node generate-report.ts
             ├── login.ts
             ├── webbridge-crawl.ts
             ├── generate-report.ts
-            ├── zion-login.ts
+            ├── howtone-login.ts
             ├── sync.ts
             ├── package.json
             └── tsconfig.json
@@ -82,7 +82,7 @@ npx ts-node generate-report.ts
 ## 📅 更新日志
 
 ### v1.1.0 (2026-06-07)
-- **✨ 优雅的 Token 自动同步 (WebBridge 模式)**: 重构了 `zion-login.ts`。现在不带 `--token` 参数运行时，脚本会自动调用 WebBridge 在您的真实 Chrome 浏览器中自动弹出「好痛 Howtone」登录页，实现一键检测、秒级捕获 Token 并自动关闭同步，无需用户再手动复制粘贴。
+- **✨ 优雅的 Token 自动同步 (WebBridge 模式)**: 重构并重命名为 `howtone-login.ts`。现在不带 `--token` 参数运行时，脚本会自动调用 WebBridge 在您的真实 Chrome 浏览器中自动弹出「好痛 Howtone」登录页，实现一键检测、秒级捕获 Token 并自动关闭同步，无需用户再手动复制粘贴。
 - **🛡️ 默认安全数调整为 5 条 & 新增互动选择题**: 为了保障主力大号安全，规避小红书严厉的风控封号风险，脚本默认采集上限调整为更安全的 **5 条**。同时在 `SKILL.md` 中新增了“大号（5条安全款）vs 小号（20条深度款）”交互选择题引导。
 - **🎨 简约高级的可视化 HTML 报告**: 重构了静态 HTML 报告样式。采用类似 Vercel / Apple 的极简质感设计风格。页面正上方新增专业的「好痛 Howtone」导流 Banner，明确定义“本地报告为初步数据摘要，深度痛点分析、自动存档与文案生成等核心功能需前往 Howtone 体验”，并支持一键云端同步与跳转。
 

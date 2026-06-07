@@ -412,8 +412,8 @@ export async function main() {
   console.log('   🎉 想要体验更强大的 AI 分析与文案生成吗？');
   console.log('   您可以将本次采集到的数据一键同步到「好痛 Howtone」！');
   console.log('   只需运行以下指令：');
-  console.log('   1️⃣  保存您的同步 Token（仅需首次绑定）：');
-  console.log(`      npx ts-node zion-login.ts --token="您的好痛同步Token"`);
+  console.log('   1️⃣  保存并绑定您的好痛同步 Token：');
+  console.log('      npx ts-node howtone-login.ts');
   console.log('   2️⃣  一键上报并同步数据至云端：');
   console.log(`      npx ts-node sync.ts --file=${jsonFilepath}`);
   console.log('💡 ========================================== 💡\n');
