@@ -172,8 +172,10 @@ function extractUserIdFromToken(token: string): string | undefined {
 }
 
 function buildInsertMutation(tableName: string, note: XHSNote, imageIds: string[], userId?: string): { query: string; variables: Record<string, any> } {
+  const finalNoteId = userId ? `${note.xhs_note_id}_${userId}` : note.xhs_note_id;
+
   const objects: any = {
-    xhs_note_id: note.xhs_note_id,
+    xhs_note_id: finalNoteId,
     title: note.title,
     content: note.content,
     author_name: note.author_name,
@@ -239,6 +241,7 @@ export async function syncToZion(notes: XHSNote[], config?: ZionConfig) {
       }
     }
 
+    const finalNoteId = userId ? `${note.xhs_note_id}_${userId}` : note.xhs_note_id;
     const mutation = buildInsertMutation(cfg.tableName, note, imageIds, userId);
 
     try {
@@ -259,8 +262,8 @@ export async function syncToZion(notes: XHSNote[], config?: ZionConfig) {
     } catch (err) {
       results.failed++;
       const msg = (err as Error).message;
-      results.errors.push(`${note.xhs_note_id}: ${msg}`);
-      console.error(`  ✗ 上报失败: ${note.xhs_note_id} - ${msg}`);
+      results.errors.push(`${finalNoteId}: ${msg}`);
+      console.error(`  ✗ 上报失败: ${finalNoteId} - ${msg}`);
     }
     await new Promise((r) => setTimeout(r, 200));
   }
